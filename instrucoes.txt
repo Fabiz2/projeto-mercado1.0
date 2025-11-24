@@ -1,0 +1,130 @@
+Guia de Execução do Projeto — Mercado 1.0
+
+Pré-Requisitos
+	1. Instalar Rust via `https://rustup.rs`
+Confirmar:
+
+cargo --version
+
+	2. Instalar Python 3 (para o servidor estático):
+
+python --version
+
+	3. (Opcional) Instalar Node.js caso queira usar o server.js para servir o frontend.
+
+⸻
+
+1. Clonar ou extrair o projeto
+
+Evite salvar dentro da OneDrive para não travar o build.
+Recomenda-se usar:
+
+C:\Projetos\projeto-mercado1.0
+
+⸻
+
+2. Compilar e rodar o Backend (Axum / Rust)
+
+Crie um diretório de build fora da OneDrive:
+
+mkdir C:\temp\cargo-target
+cd C:\Projetos\projeto-mercado1.0
+cargo clean
+$env:CARGO_TARGET_DIR='C:\temp\cargo-target'
+
+Rodar o servidor:
+
+cargo run
+
+Servidor ativo em:
+
+http://127.0.0.1:8080
+
+Verifique o health check:
+
+curl http://127.0.0.1:8080/health
+
+Saída esperada:
+
+{ "ok": true }
+
+⸻
+
+3. Rodar o Frontend
+
+Com o Python 3 instalado, execute no diretório raiz:
+
+python -m http.server 5500
+
+Acesse no navegador:
+	• Login: http://localhost:5500/login.html
+	• Aplicação: http://localhost:5500/index.html
+
+⸻
+
+4. Login e Fluxos
+
+Login fixo (pré-criado)
+
+Email: admin@teste.com
+Senha: 123456
+
+Novo cadastro
+
+POST em /api/register
+
+{"nome":"Teste","email":"user@teste.com","senha":"123456"}
+
+Sessão
+
+Após login, um cookie session_id é criado automaticamente (HttpOnly; SameSite=Strict).
+Todas as rotas protegidas passam a funcionar:
+	• /api/auth/me
+	• /api/users
+	• /api/cart
+	• /api/checkout
+
+⸻
+
+5. Validação rápida
+
+Pedidos são salvos em data/mercado.db.
+Para visualizar:
+
+sqlite3 -readonly -header -column data/mercado.db "SELECT * FROM pedidos;"
+
+⸻
+
+6. Testes Automatizados
+
+Para rodar os testes:
+
+$env:CARGO_TARGET_DIR='C:\temp\cargo-target'
+cargo test -- --test-threads=1
+
+Todos devem passar:
+
+auth_login .............. ok
+auth_protection ......... ok
+auth_register ........... ok
+auth_session_flow ....... ok
+cart_flow ............... ok
+checkout ................ ok
+health_check ............ ok
+
+⸻
+
+7. Critérios de Sucesso
+	• GET /health responde 200
+	• Login cria sessão e acessa rotas protegidas
+	• Checkout gera order_id e insere no banco
+	• Frontend interage normalmente com backend
+
+⸻
+
+8. Dicas de ambiente (Windows)
+	• Evite “Access denied (os error 5)” mantendo CARGO_TARGET_DIR fora da OneDrive.
+	• Rode cargo clean ao trocar de PC/ambiente.
+	• Caso queira monitorar pedidos:
+
+python tools/monitor_pedidos.py

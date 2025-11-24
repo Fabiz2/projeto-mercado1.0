@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado Online</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=1.1">
+</head>
+<body>
+    <header class="header navbar navbar-expand-lg bg-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand logo d-flex align-items-center gap-2" href="#">
+                <span>🛒</span>
+                <span>Mercado Online</span>
+            </a>
+            <nav class="nav ms-auto d-flex gap-2">
+                <button class="nav-btn active btn btn-outline-primary" data-view="catalog">
+                    <span>Catálogo</span>
+                </button>
+                <button class="nav-btn btn btn-outline-primary position-relative" data-view="cart">
+                    <span>Carrinho</span>
+                    <span class="badge bg-secondary ms-2" id="cart-badge">0</span>
+                </button>
+                <button class="nav-btn btn btn-primary" data-view="checkout">
+                    <span>Checkout</span>
+                </button>
+                
+            </nav>
+        </div>
+    </header>
+
+    <main class="main py-4">
+        <div class="container">
+            <!-- Seção Catálogo -->
+            <section id="view-catalog" class="view">
+                <h2 class="mb-3">Catálogo de Produtos</h2>
+                <div id="catalog-content" class="catalog-grid">
+                    <!-- Produtos serão renderizados aqui -->
+                </div>
+            </section>
+
+            <!-- Seção Carrinho -->
+            <section id="view-cart" class="view hidden">
+                <div class="container my-4 p-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0">Seu Carrinho</h2>
+                        <button class="btn btn-outline-primary btn-sm" onclick="setView('catalog')">
+                            <i class="bi bi-arrow-left me-1"></i> Voltar ao Catálogo
+                        </button>
+                    </div>
+                    <div class="row g-4">
+                        <!-- Coluna esquerda: tabela/cards do carrinho -->
+                        <div class="col-12 col-md-8">
+                            <div id="cart-content" class="">
+                                <!-- Itens do carrinho serão renderizados aqui -->
+                            </div>
+                        </div>
+                        <!-- Coluna direita: resumo do pedido -->
+                        <div class="col-12 col-md-4">
+                            <div id="cart-totals" class="sticky-md">
+                                <!-- Totais serão renderizados aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção Checkout -->
+            <section id="view-checkout" class="view hidden">
+                <h2 class="mb-3">Finalizar Pedido</h2>
+                <div id="checkout-content" class="checkout-wrapper">
+                    <!-- Formulário de checkout será renderizado aqui -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Container de Toasts -->
+    <div id="toasts" aria-live="polite"></div>
+
+    <!-- Modal: Termos e Condições -->
+    <div class="modal fade" id="termosModal" tabindex="-1" aria-labelledby="termosTitle" aria-modal="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header">
+            <h5 class="modal-title" id="termosTitle">Termos e Condições de Compra e Uso</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body termos-body">
+            <p><strong>Termos e Condições de Compra e Uso</strong></p>
+            <p>Ao realizar uma compra em nosso sistema, o usuário declara estar ciente e de acordo com os seguintes termos:</p>
+            <p><strong>Uso do Sistema:</strong><br>O sistema destina-se exclusivamente à simulação de compras online. As informações inseridas são de responsabilidade do usuário.</p>
+            <p><strong>Pedidos e Pagamentos:</strong><br>Todos os valores exibidos são meramente ilustrativos. O pedido é considerado concluído após a confirmação do pagamento via PIX ou Cartão de Crédito, conforme opção escolhida.</p>
+            <p><strong>Privacidade dos Dados:</strong><br>As informações fornecidas (nome, e-mail e endereço) são utilizadas apenas para a conclusão do pedido e não são compartilhadas com terceiros.</p>
+            <p><strong>Alterações no Pedido:</strong><br>Uma vez finalizado o pedido, não é possível realizar alterações nos produtos ou nas quantidades.</p>
+            <p><strong>Limitação de Responsabilidade:</strong><br>O sistema não se responsabiliza por eventuais falhas técnicas, interrupções temporárias ou informações incorretas fornecidas pelo usuário.</p>
+            <p><strong>Aceite dos Termos:</strong><br>Ao marcar a opção “Aceito os termos e condições”, o usuário confirma ter lido, entendido e concordado com todas as cláusulas aqui descritas.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" id="btnTermosEntendi" data-bs-dismiss="modal">Li e entendi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal: Diagrama do Sistema -->
+    <div class="modal fade" id="diagramModal" tabindex="-1" aria-labelledby="diagramTitle" aria-modal="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-light">
+          <div class="modal-header">
+            <h5 class="modal-title" id="diagramTitle">Diagrama do Sistema</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body p-0">
+            <img src="images/Diagrama com setas atualizado (1).drawio.svg" alt="Diagrama do Sistema" style="width:100%;height:auto;max-height:70vh;object-fit:contain;display:block;" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js?v=1.1"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 
+    === COMO RODAR ===
+    
+    1. Backend (API):
+       - Navegue até a pasta do projeto Rust
+       - Execute: cargo run
+       - A API estará disponível em http://127.0.0.1:8080
+    
+    2. Frontend:
+       - Navegue até a pasta com os arquivos HTML/CSS/JS
+       - Execute: python -m http.server 5500
+       - Acesse: http://127.0.0.1:5500/
+    
+    3. Verificar CORS:
+       - Se houver problemas de CORS, verifique as configurações do backend
+       - O backend deve permitir requisições de http://127.0.0.1:5500
+    
+    4. Funcionalidades:
+       - Catálogo: visualizar produtos e adicionar ao carrinho
+       - Carrinho: gerenciar itens, quantidades e ver totais
+       - Checkout: finalizar pedido com dados pessoais
+    -->
+</body>
+</html>
+
+<!-- 
+Como rodar:
+1. Backend: cargo run (porta 8080)
+2. Frontend: python -m http.server 5500 → http://127.0.0.1:5500/
+3. Verificar CORS no backend se necessário
+-->

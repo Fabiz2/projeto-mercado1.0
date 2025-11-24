@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar • Mercado Online</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=1.1" />
+  <style>
+    /* Fundo premium com textura e animação sutil */
+    @keyframes move-bg {
+      from { background-position: 0 0; }
+      to { background-position: 200px 200px; }
+    }
+    body {
+      background:
+        repeating-linear-gradient(135deg, var(--parallax-stripe-color) 0, var(--parallax-stripe-color) 1px, transparent 1px, transparent 20px),
+        linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-end));
+      background-size: 200px 200px;
+      animation: move-bg 40s linear infinite;
+      color: var(--text);
+      transition: background 0.3s ease, color 0.3s ease;
+      min-height: 100vh; display:flex; align-items:center; justify-content:center; padding: 2rem;
+    }
+
+    .login-wrapper { width: 100%; max-width: 420px; }
+    .login-card {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(13,110,253,0.25);
+      border-radius: var(--radius);
+      box-shadow: 0 0 10px rgba(13,110,253,0.25), 0 20px 40px rgba(0,0,0,0.35);
+      padding: 1.5rem;
+      opacity: 0; transform: scale(0.98); animation: cardIn 250ms ease-out forwards;
+    }
+    @keyframes cardIn { to { opacity: 1; transform: scale(1); } }
+
+    .brand { display:flex; align-items:center; gap:.5rem; margin-bottom:.75rem; color: #4dabff; font-weight:700; }
+    .brand .bi-cart4 { filter: drop-shadow(0 0 6px rgba(13,110,253,0.35)); }
+    .subtitle { color: var(--text-secondary); font-size:.95rem; margin-bottom: 1rem; }
+
+    .form-label { color: var(--text-secondary); }
+    /* .field and .field-icon now styled via global style.css for consistent alignment */
+    .form-control {
+      background: rgba(0,0,0,0.35);
+      border-color: var(--border);
+      color: var(--text-primary);
+      transition: box-shadow .3s, border-color .3s;
+    }
+    .form-control:focus { border-color: #4dabff; box-shadow: 0 0 0 .2rem rgba(77,171,255,0.25); }
+    .is-invalid { border-color: #ff4d4d !important; }
+    .form-label.invalid { color: #ffb3b3; }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #007bff, #00d4ff);
+      border: none;
+      background-size: 200% 100%;
+      transition: transform .12s ease, box-shadow .12s ease, background-position .3s ease;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(13,110,253,0.35); background-position: 100% 0; }
+    .btn:active { transform: scale(0.98); }
+    .btn-spin .bi-arrow-repeat { animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toggle-pass { position:absolute; right:.6rem; top:50%; transform: translateY(-50%); cursor:pointer; color: var(--text-secondary); transition: transform .2s ease; }
+    .toggle-pass:active { transform: translateY(-50%) scale(0.95); }
+    .invalid-feedback { display:block; }
+    .shake { animation: shake .25s linear; }
+    @keyframes shake { 0%{transform:translateX(0)}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}100%{transform:translateX(0)} }
+
+    /* Toasts com vidro fosco e ícones */
+    .top-right { position: fixed; right: 1rem; top: 1rem; z-index: 2000; }
+    .toast-item {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(5px);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding:.75rem 1rem; margin-bottom:.5rem; box-shadow: 0 6px 16px var(--shadow);
+      transform: translateX(20px); opacity: 0; animation: toastIn .25s ease forwards;
+      display:flex; align-items:center; gap:.5rem;
+    }
+    .toast-item.success { border-color: var(--success); }
+    .toast-item.error { border-color: var(--error); }
+    .toast-item i { opacity: .9; }
+    @keyframes toastIn { to { transform: translateX(0); opacity: 1; } }
+    @keyframes toastOut { to { opacity: 0; } }
+
+    .link-muted { color: var(--text-secondary); text-decoration: none; }
+    .link-muted:hover { color: var(--text-primary); }
+    .remember { display:flex; align-items:center; gap:.5rem; }
+
+    /* Modal translúcido com transições */
+    .modal-content { background: rgba(255,255,255,0.06); color: var(--text-primary); backdrop-filter: blur(8px); border: 1px solid rgba(13,110,253,0.25); }
+    .modal-backdrop.show { backdrop-filter: blur(4px); }
+    .modal.fade .modal-dialog { transform: translateY(-10px); transition: transform 200ms ease, opacity 200ms ease; }
+    .modal.show .modal-dialog { transform: translateY(0); }
+
+    .avatar { width: 42px; height: 42px; border-radius: 50%; display:flex; align-items:center; justify-content:center; background: var(--bg-tertiary); border:1px solid var(--border); font-weight:700; color: var(--text-primary); }
+
+    /* Responsividade */
+    @media (max-width: 480px){
+      .login-wrapper { max-width: 90%; }
+      .login-card { box-shadow: 0 0 6px rgba(13,110,253,0.2); padding: 1.25rem; }
+      .modal-dialog { max-width: 100%; margin: .5rem; }
+      .modal-content { max-height: calc(100vh - 1rem); overflow: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toasts" class="top-right" aria-live="polite" aria-atomic="true"></div>
+  <button id="themeToggle" class="theme-toggle top-right" aria-label="Alternar tema">🌙</button>
+
+  <div class="login-wrapper">
+    <div class="login-card" id="loginCard">
+      <div class="brand"><i class="bi bi-cart4"></i><span>Mercado Online</span></div>
+      <h1 class="h5 mb-1">Acesse sua conta</h1>
+      <p class="subtitle">Entre para ver seu catálogo, acompanhar o carrinho e finalizar seus pedidos.</p>
+      <form id="loginForm" novalidate>
+        <div class="mb-3">
+          <label for="email" class="form-label">E-mail</label>
+          <div class="input-group input-group-lg field">
+            <span class="input-group-text field-icon"><i class="bi bi-envelope"></i></span>
+            <input type="email" id="email" class="form-control field-control" placeholder="email@exemplo.com" required aria-describedby="emailHelp" autofocus />
+          </div>
+          <div id="emailHelp" class="form-text field-hint">Utilize seu e-mail cadastrado</div>
+          <div class="invalid-feedback" id="emailError" aria-live="polite" hidden>E-mail inválido</div>
+        </div>
+        <div class="mb-2">
+          <label for="senha" class="form-label">Senha</label>
+          <div class="input-group input-group-lg field">
+            <span class="input-group-text field-icon"><i class="bi bi-lock"></i></span>
+            <input type="password" id="senha" class="form-control field-control" placeholder="Sua senha" required />
+            <button class="btn field-addon" type="button" id="togglePass" aria-label="Mostrar/ocultar senha" tabindex="0">
+              <i class="bi bi-eye-slash"></i>
+            </button>
+          </div>
+          <div class="invalid-feedback" id="senhaError" aria-live="polite" hidden>Informe sua senha</div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <label class="remember"><input type="checkbox" id="rememberMe" /> <span>Lembrar-me</span></label>
+          <a href="#" class="link-muted" id="createAccountLink">Criar conta</a>
+        </div>
+        <button type="submit" class="btn btn-primary w-100" id="btnEntrar">
+          <span class="btn-text">Entrar</span>
+          <span class="btn-spin d-none"><span class="spinner-border spinner-border-sm me-2"></span>Validando…</span>
+        </button>
+        <div class="text-danger mt-2" id="loginMsg" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Cadastro -->
+  <div class="modal fade" id="cadastroModal" tabindex="-1" aria-labelledby="cadastroTitle" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cadastroTitle">Criar Conta</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="registerForm" novalidate>
+            <div class="mb-3">
+              <label for="regNome" class="form-label">Nome</label>
+              <div class="input-group input-group-lg field">
+                <span class="input-group-text field-icon"><i class="bi bi-person"></i></span>
+                <input type="text" id="regNome" class="form-control field-control" placeholder="Seu nome" required />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="regEmail" class="form-label">E-mail</label>
+              <div class="input-group input-group-lg field">
+                <span class="input-group-text field-icon"><i class="bi bi-envelope"></i></span>
+                <input type="email" id="regEmail" class="form-control field-control" placeholder="email@exemplo.com" required />
+              </div>
+              <div class="form-text field-hint">Use um e-mail válido</div>
+              <div class="invalid-feedback" id="regEmailError" aria-live="polite" hidden>E-mail inválido ou já cadastrado</div>
+            </div>
+            <div class="mb-3">
+              <label for="regSenha" class="form-label">Senha</label>
+              <div class="input-group input-group-lg field">
+                <span class="input-group-text field-icon"><i class="bi bi-lock"></i></span>
+                <input type="password" id="regSenha" class="form-control field-control" placeholder="Mínimo 6 caracteres" required />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="regSenha2" class="form-label">Confirmar senha</label>
+              <div class="input-group input-group-lg field">
+                <span class="input-group-text field-icon"><i class="bi bi-lock-fill"></i></span>
+                <input type="password" id="regSenha2" class="form-control field-control" placeholder="Repita a senha" required />
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="regTermos" />
+                <label class="form-check-label" for="regTermos">Aceito os <a href="#" id="openTermos">Termos</a></label>
+                <div id="regTermsMsg" class="form-text text-warning d-none">É necessário aceitar os termos para criar a conta.</div>
+              </div>
+              <button type="submit" class="btn btn-primary" id="btnCadastrar">
+                <span class="btn-text">Cadastrar</span>
+                <span class="btn-spin d-none"><i class="bi bi-arrow-repeat me-2"></i>Cadastrando…</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Termos (cópia simplificada) -->
+  <div class="modal fade" id="termosModal" tabindex="-1" aria-labelledby="termosTitle" aria-modal="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="termosTitle">Termos de Uso e Cadastro – Mercado Online</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Termos de Uso e Cadastro – Mercado Online</strong></p>
+          <p>Ao criar uma conta no Mercado Online, você concorda com as condições abaixo:</p>
+          <p><strong>1. Responsabilidade dos dados</strong><br>As informações fornecidas durante o cadastro devem ser verdadeiras e atualizadas. O usuário é responsável por manter seus dados corretos e por preservar a confidencialidade da sua senha.</p>
+          <p><strong>2. Privacidade e segurança</strong><br>O site utiliza medidas de segurança para proteger suas informações. Nenhuma senha é armazenada em texto puro — todas são protegidas por criptografia.</p>
+          <p><strong>3. Uso da plataforma</strong><br>O acesso é pessoal e intransferível. É proibido utilizar a conta para fins fraudulentos ou atividades que prejudiquem o funcionamento do sistema.</p>
+          <p><strong>4. Comunicação</strong><br>Ao se cadastrar, o usuário autoriza o envio de notificações sobre pedidos, suporte e atualizações importantes. Nenhum conteúdo promocional será enviado sem consentimento prévio.</p>
+          <p><strong>5. Encerramento da conta</strong><br>O usuário pode solicitar o encerramento de sua conta a qualquer momento. O site reserva-se o direito de suspender acessos que violem estes termos.</p>
+          <p><strong>6. Atualizações dos termos</strong><br>Os termos podem ser atualizados periodicamente. Recomenda-se revisá-los regularmente para manter-se informado sobre alterações.</p>
+          <p>Ao marcar “Aceito os Termos”, você confirma que leu e concorda com as condições acima e com a política de privacidade do Mercado Online.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Tema: aplicar preferência e alternância (inclui Bootstrap)
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('themeToggle');
+      if (!toggle) return;
+      const applyTheme = (t) => {
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('data-bs-theme', t);
+        toggle.textContent = t === 'dark' ? '🌙' : '☀️';
+      };
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      applyTheme(currentTheme);
+      toggle.addEventListener('click', () => {
+        const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+        localStorage.setItem('theme', next);
+      });
+    });
+    function showToast(msg, type='success'){
+      const el = document.createElement('div');
+      el.className = `toast-item ${type}`;
+      const icon = type==='success' ? 'bi-check-circle' : 'bi-x-circle';
+      el.innerHTML = `<i class="bi ${icon}"></i><span>${msg}</span>`;
+      document.getElementById('toasts').appendChild(el);
+      setTimeout(() => { el.style.animation = 'toastOut 150ms ease forwards'; setTimeout(()=> el.remove(), 180); }, 2500);
+    }
+
+    // Mostrar toast vindo do logout
+    (function(){
+      const t = sessionStorage.getItem('toast');
+      if(t){ showToast(t, 'success'); sessionStorage.removeItem('toast'); }
+    })();
+
+    // Guard: se já estiver logado, ir para /
+    (async function(){
+      try {
+        const r = await fetch('/api/auth/me');
+        if(r.ok){ location.href = '/'; }
+      } catch {}
+    })();
+
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailInput = document.getElementById('email');
+    const senhaInput = document.getElementById('senha');
+    const btnEntrar = document.getElementById('btnEntrar');
+    const btnText = btnEntrar.querySelector('.btn-text');
+    const btnSpin = btnEntrar.querySelector('.btn-spin');
+    const loginMsg = document.getElementById('loginMsg');
+    const loginCard = document.getElementById('loginCard');
+    const togglePass = document.getElementById('togglePass');
+    const togglePassIcon = document.querySelector('#togglePass i');
+
+    togglePass.addEventListener('click', () => {
+      const is = senhaInput.type === 'password';
+      senhaInput.type = is ? 'text' : 'password';
+      togglePassIcon.className = is ? 'bi bi-eye' : 'bi bi-eye-slash';
+    });
+    togglePass.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); togglePass.click(); }});
+
+    document.getElementById('createAccountLink').addEventListener('click', (e)=>{
+      e.preventDefault();
+      const m = new bootstrap.Modal(document.getElementById('cadastroModal'));
+      m.show();
+    });
+
+    document.getElementById('openTermos').addEventListener('click', (e)=>{
+      e.preventDefault();
+      const m = new bootstrap.Modal(document.getElementById('termosModal'));
+      m.show();
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      loginMsg.textContent = '';
+      const email = emailInput.value.trim();
+      const senha = senhaInput.value;
+      const remember = document.getElementById('rememberMe').checked;
+      let valid = true;
+      const emailField = emailInput.closest('.field');
+      const senhaField = senhaInput.closest('.field');
+      if(!emailRe.test(email)){ document.getElementById('emailError').hidden = false; emailInput.classList.add('is-invalid'); if(emailField) emailField.classList.add('is-invalid'); valid=false; } else { document.getElementById('emailError').hidden = true; emailInput.classList.remove('is-invalid'); if(emailField) emailField.classList.remove('is-invalid'); }
+      if(!senha){ document.getElementById('senhaError').hidden = false; senhaInput.classList.add('is-invalid'); if(senhaField) senhaField.classList.add('is-invalid'); valid=false; } else { document.getElementById('senhaError').hidden = true; senhaInput.classList.remove('is-invalid'); if(senhaField) senhaField.classList.remove('is-invalid'); }
+      if(!valid){ loginCard.classList.add('shake'); setTimeout(()=> loginCard.classList.remove('shake'), 260); return; }
+      btnText.classList.add('d-none'); btnSpin.classList.remove('d-none'); btnEntrar.disabled = true;
+      try {
+        const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, senha, remember }) });
+        if(r.ok){ try { sessionStorage.setItem('toast', 'Login realizado com sucesso'); } catch{}; location.href = '/'; return; }
+        if(r.status === 401 || r.status === 404){ loginMsg.textContent = 'E-mail ou senha incorretos'; loginCard.classList.add('shake'); setTimeout(()=> loginCard.classList.remove('shake'), 260); senhaInput.value=''; senhaInput.focus(); return; }
+        const t = await r.text(); loginMsg.textContent = t || 'Falha no login';
+      } catch (e){ loginMsg.textContent = 'Erro de rede ao autenticar'; }
+      finally { btnText.classList.remove('d-none'); btnSpin.classList.add('d-none'); btnEntrar.disabled = false; }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const btnCad = document.getElementById('btnCadastrar');
+      const cadText = btnCad.querySelector('.btn-text');
+      const cadSpin = btnCad.querySelector('.btn-spin');
+      const nome = document.getElementById('regNome').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const senha = document.getElementById('regSenha').value;
+      const senha2 = document.getElementById('regSenha2').value;
+      const emailErr = document.getElementById('regEmailError');
+      emailErr.hidden = true; emailErr.textContent = 'E-mail inválido ou já cadastrado';
+      const regEmailInput = document.getElementById('regEmail');
+      const regEmailField = regEmailInput.closest('.field');
+      if(!emailRe.test(email)){ emailErr.hidden = false; regEmailInput.classList.add('is-invalid'); if(regEmailField) regEmailField.classList.add('is-invalid'); return; } else { regEmailInput.classList.remove('is-invalid'); if(regEmailField) regEmailField.classList.remove('is-invalid'); }
+      if(!senha || senha.length < 6){ showToast('A senha deve ter pelo menos 6 caracteres', 'error'); return; }
+      if(senha !== senha2){ showToast('Confirmação de senha não confere', 'error'); return; }
+      const termosAccepted = document.getElementById('regTermos').checked;
+      const regTermsMsg = document.getElementById('regTermsMsg');
+      if(!termosAccepted){ regTermsMsg.classList.remove('d-none'); document.getElementById('regTermos').focus(); return; } else { regTermsMsg.classList.add('d-none'); }
+      cadText.classList.add('d-none'); cadSpin.classList.remove('d-none'); btnCad.disabled = true;
+      try {
+        const r = await fetch('/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nome, email, senha }) });
+        if(r.ok){ showToast('Conta criada! Faça login.', 'success'); bootstrap.Modal.getInstance(document.getElementById('cadastroModal')).hide(); return; }
+        if(r.status === 400){ emailErr.hidden = false; document.getElementById('regEmail').classList.add('is-invalid'); return; }
+        showToast('Falha ao cadastrar', 'error');
+      } catch (e){ showToast('Erro de rede ao cadastrar', 'error'); }
+      finally { cadText.classList.remove('d-none'); cadSpin.classList.add('d-none'); btnCad.disabled = false; }
+    });
+
+    // Ocultar mensagem sutil ao marcar os termos
+    document.getElementById('regTermos').addEventListener('change', () => {
+      const regTermsMsg = document.getElementById('regTermsMsg');
+      regTermsMsg.classList.add('d-none');
+    });
+  </script>
+</body>
+</html>
